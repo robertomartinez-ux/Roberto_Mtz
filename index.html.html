@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>HSK 1 – Quiz</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    width: 350px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+}
+
+.char {
+    font-size: 60px;
+    margin-bottom: 10px;
+}
+
+.pinyin {
+    font-size: 20px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.correct {
+    background: #4CAF50;
+    color: white;
+}
+
+.wrong {
+    background: #F44336;
+    color: white;
+}
+.correct-answer {
+    background: #4CAF50;
+    color: white;
+    border: 2px solid #2e7d32;
+}
+.feedback {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.tiktok {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+.tiktok a {
+    text-decoration: none;
+    color: #555;
+}
+
+.tiktok a:hover {
+    color: #000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+	<div id="score">✅ Aciertos: <strong>0</strong></div>
+    <div class="char" id="char"></div>
+    <div class="pinyin" id="pinyin"></div>
+    <div id="options"></div>
+	<div id="feedback" class="feedback"></div>
+    <div class="tiktok">
+        👉 <a href="https://www.tiktok.com/@sistemasnovatos?_r=1&_t=ZS-93Qab48X7Nk" target="_blank">
+            Sigueme en TikTok: <strong>SistemasParaNovatos</strong>
+        </a>
+    </div>
+</div>
+
+<script>
+const words = [
+{c:"爱",p:"ài",m:"amar"},{c:"八",p:"bā",m:"ocho"},{c:"爸爸",p:"bàba",m:"papá"},
+{c:"杯子",p:"bēizi",m:"vaso"},{c:"北京",p:"Běijīng",m:"Pekín"},
+{c:"本",p:"běn",m:"libro / cuaderno"},{c:"不",p:"bù",m:"no"},
+{c:"不客气",p:"bú kèqi",m:"de nada"},{c:"菜",p:"cài",m:"platillo"},
+{c:"茶",p:"chá",m:"té"},{c:"吃",p:"chī",m:"comer"},
+{c:"出租车",p:"chūzūchē",m:"taxi"},{c:"打电话",p:"dǎ diànhuà",m:"llamar"},
+{c:"大",p:"dà",m:"grande"},{c:"的",p:"de",m:"posesivo"},
+{c:"点",p:"diǎn",m:"hora / punto"},{c:"电脑",p:"diànnǎo",m:"computadora"},
+{c:"电视",p:"diànshì",m:"televisión"},{c:"电影",p:"diànyǐng",m:"película"},
+{c:"东西",p:"dōngxi",m:"cosa"},{c:"都",p:"dōu",m:"todos"},
+{c:"读",p:"dú",m:"leer"},{c:"对不起",p:"duìbuqǐ",m:"lo siento"},
+{c:"多",p:"duō",m:"mucho"},{c:"多少",p:"duōshao",m:"cuánto"},
+{c:"儿子",p:"érzi",m:"hijo"},{c:"二",p:"èr",m:"dos"},
+{c:"饭店",p:"fàndiàn",m:"restaurante"},{c:"飞机",p:"fēijī",m:"avión"},
+{c:"分钟",p:"fēnzhōng",m:"minuto"},{c:"高兴",p:"gāoxìng",m:"feliz"},
+{c:"个",p:"gè",m:"clasificador"},{c:"工作",p:"gōngzuò",m:"trabajo"},
+{c:"狗",p:"gǒu",m:"perro"},{c:"汉语",p:"Hànyǔ",m:"chino"},
+{c:"好",p:"hǎo",m:"bueno"},{c:"号",p:"hào",m:"número"},
+{c:"喝",p:"hē",m:"beber"},{c:"和",p:"hé",m:"y"},
+{c:"很",p:"hěn",m:"muy"},{c:"后面",p:"hòumian",m:"detrás"},
+{c:"回",p:"huí",m:"volver"},{c:"会",p:"huì",m:"saber / poder"},
+{c:"火车站",p:"huǒchēzhàn",m:"estación de tren"},
+{c:"几",p:"jǐ",m:"cuántos"},{c:"家",p:"jiā",m:"casa"},
+{c:"叫",p:"jiào",m:"llamarse"},{c:"今天",p:"jīntiān",m:"hoy"},
+{c:"九",p:"jiǔ",m:"nueve"},{c:"开",p:"kāi",m:"abrir"},
+{c:"看",p:"kàn",m:"ver"},{c:"看见",p:"kànjiàn",m:"ver (lograr ver)"},
+{c:"块",p:"kuài",m:"moneda"},{c:"来",p:"lái",m:"venir"},
+{c:"老师",p:"lǎoshī",m:"maestro"},{c:"了",p:"le",m:"partícula"},
+{c:"冷",p:"lěng",m:"frío"},{c:"里",p:"lǐ",m:"dentro"},
+{c:"六",p:"liù",m:"seis"},{c:"妈妈",p:"māma",m:"mamá"},
+{c:"吗",p:"ma",m:"pregunta"},{c:"买",p:"mǎi",m:"comprar"},
+{c:"猫",p:"māo",m:"gato"},{c:"没",p:"méi",m:"no (pasado)"},
+{c:"没关系",p:"méi guānxi",m:"no pasa nada"},
+{c:"米饭",p:"mǐfàn",m:"arroz"},{c:"名字",p:"míngzi",m:"nombre"},
+{c:"明天",p:"míngtiān",m:"mañana"},{c:"哪",p:"nǎ",m:"cuál"},
+{c:"哪儿",p:"nǎr",m:"dónde"},{c:"那",p:"nà",m:"ese"},
+{c:"那儿",p:"nàr",m:"allí"},{c:"呢",p:"ne",m:"partícula"},
+{c:"能",p:"néng",m:"poder"},{c:"你",p:"nǐ",m:"tú"},
+{c:"年",p:"nián",m:"año"},{c:"女儿",p:"nǚ’ér",m:"hija"},
+{c:"朋友",p:"péngyou",m:"amigo"},{c:"漂亮",p:"piàoliang",m:"bonito"},
+{c:"苹果",p:"píngguǒ",m:"manzana"},{c:"七",p:"qī",m:"siete"},
+{c:"钱",p:"qián",m:"dinero"},{c:"前面",p:"qiánmian",m:"delante"},
+{c:"请",p:"qǐng",m:"por favor"},{c:"去",p:"qù",m:"ir"},
+{c:"热",p:"rè",m:"caliente"},{c:"人",p:"rén",m:"persona"},
+{c:"认识",p:"rènshi",m:"conocer"},{c:"日",p:"rì",m:"día"},
+{c:"三",p:"sān",m:"tres"},{c:"商店",p:"shāngdiàn",m:"tienda"},
+{c:"上",p:"shàng",m:"arriba"},{c:"上午",p:"shàngwǔ",m:"mañana AM"},
+{c:"少",p:"shǎo",m:"poco"},{c:"谁",p:"shéi",m:"quién"},
+{c:"什么",p:"shénme",m:"qué"},{c:"十",p:"shí",m:"diez"},
+{c:"时候",p:"shíhou",m:"momento"},{c:"是",p:"shì",m:"ser / estar"},
+{c:"书",p:"shū",m:"libro"},{c:"水",p:"shuǐ",m:"agua"},
+{c:"水果",p:"shuǐguǒ",m:"fruta"},{c:"睡觉",p:"shuìjiào",m:"dormir"},
+{c:"说",p:"shuō",m:"hablar"},{c:"四",p:"sì",m:"cuatro"},
+{c:"岁",p:"suì",m:"años"},{c:"他",p:"tā",m:"él"},
+{c:"她",p:"tā",m:"ella"},{c:"太",p:"tài",m:"demasiado"},
+{c:"天气",p:"tiānqì",m:"clima"},{c:"听",p:"tīng",m:"escuchar"},
+{c:"同学",p:"tóngxué",m:"compañero"},{c:"喂",p:"wèi",m:"hola teléfono"},
+{c:"我",p:"wǒ",m:"yo"},{c:"我们",p:"wǒmen",m:"nosotros"},
+{c:"五",p:"wǔ",m:"cinco"},{c:"喜欢",p:"xǐhuan",m:"gustar"},
+{c:"下",p:"xià",m:"abajo"},{c:"下午",p:"xiàwǔ",m:"tarde"},
+{c:"下雨",p:"xiàyǔ",m:"llover"},{c:"先生",p:"xiānsheng",m:"señor"},
+{c:"现在",p:"xiànzài",m:"ahora"},{c:"想",p:"xiǎng",m:"querer / pensar"},
+{c:"小",p:"xiǎo",m:"pequeño"},{c:"小姐",p:"xiǎojiě",m:"señorita"},
+{c:"写",p:"xiě",m:"escribir"},{c:"谢谢",p:"xièxie",m:"gracias"},
+{c:"星期",p:"xīngqī",m:"semana"},{c:"学生",p:"xuésheng",m:"estudiante"},
+{c:"学习",p:"xuéxí",m:"estudiar"},{c:"学校",p:"xuéxiào",m:"escuela"},
+{c:"一",p:"yī",m:"uno"},{c:"衣服",p:"yīfu",m:"ropa"},
+{c:"医生",p:"yīshēng",m:"doctor"},{c:"医院",p:"yīyuàn",m:"hospital"},
+{c:"椅子",p:"yǐzi",m:"silla"},{c:"有",p:"yǒu",m:"tener"},
+{c:"月",p:"yuè",m:"mes"},{c:"再见",p:"zàijiàn",m:"adiós"},
+{c:"在",p:"zài",m:"estar en"},{c:"怎么",p:"zěnme",m:"cómo"},
+{c:"怎么样",p:"zěnmeyàng",m:"qué tal"},
+{c:"这",p:"zhè",m:"este"},{c:"这儿",p:"zhèr",m:"aquí"},
+{c:"中国",p:"Zhōngguó",m:"China"},{c:"中午",p:"zhōngwǔ",m:"mediodía"},
+{c:"住",p:"zhù",m:"vivir"},{c:"桌子",p:"zhuōzi",m:"mesa"},
+{c:"字",p:"zì",m:"carácter"},{c:"昨天",p:"zuótiān",m:"ayer"}
+];
+
+let current;
+let score = 0;
+
+function loadWord() {
+    current = words[Math.floor(Math.random() * words.length)];
+    document.getElementById("char").innerText = current.c;
+    document.getElementById("pinyin").innerText = current.p;
+
+    const opts = [...words].sort(() => 0.5 - Math.random()).slice(0,3).map(w => w.m);
+    if (!opts.includes(current.m)) opts[0] = current.m;
+
+    const optionsDiv = document.getElementById("options");
+    const feedbackDiv = document.getElementById("feedback");
+
+    optionsDiv.innerHTML = "";
+    feedbackDiv.innerHTML = "";
+
+    opts.sort(() => 0.5 - Math.random()).forEach(opt => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(btn, opt);
+        optionsDiv.appendChild(btn);
+    });
+}
+
+function checkAnswer(button, answer) {
+    const buttons = document.querySelectorAll("#options button");
+    const feedbackDiv = document.getElementById("feedback");
+    const scoreDiv = document.getElementById("score").querySelector("strong");
+
+    buttons.forEach(btn => btn.disabled = true);
+
+    if (answer === current.m) {
+        button.className = "correct";
+        feedbackDiv.innerHTML = "✅ ¡Correcto!";
+        score++;
+        scoreDiv.innerText = score;
+    } else {
+        button.className = "wrong";
+        feedbackDiv.innerHTML = `❌ Incorrecto. La respuesta correcta es: <strong>${current.m}</strong>`;
+
+        buttons.forEach(btn => {
+            if (btn.innerText === current.m) {
+                btn.classList.add("correct-answer");
+            }
+        });
+    }
+
+    setTimeout(loadWord, 1500);
+}
+
+
+loadWord();
+</script>
+
+</body>
+</html>
