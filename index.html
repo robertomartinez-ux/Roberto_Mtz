@@ -124,6 +124,7 @@ function startGame() {
     document.querySelector("#score strong").innerText = score;
     document.getElementById("menu").style.display = "none";
     document.getElementById("game").style.display = "block";
+    document.querySelector('button[onclick="sendScore()"]').style.display = "block";
 
     loadWord();
 }
@@ -143,6 +144,7 @@ function startSurvival() {
     document.querySelector("#score strong").innerText = score;
     document.getElementById("menu").style.display = "none";
     document.getElementById("game").style.display = "block";
+    document.querySelector('button[onclick="sendScore()"]').style.display = "block";
 
     loadWord();
 }
@@ -162,6 +164,7 @@ function startSurvivalHard() {
     document.querySelector("#score strong").innerText = score;
     document.getElementById("menu").style.display = "none";
     document.getElementById("game").style.display = "block";
+    document.querySelector('button[onclick="sendScore()"]').style.display = "block";
 
     loadWord();
 }
@@ -176,6 +179,7 @@ function backToMenu() {
     document.getElementById("menu").style.display = "block";
     document.getElementById("feedback").innerText = "";
     document.getElementById("modeLabel").innerText = "";
+    document.querySelector('button[onclick="sendScore()"]').style.display = "none";
 }
 
 // ---------- JUEGO ----------
@@ -259,4 +263,5 @@ function checkAnswer(button, answer) {
 
 </body>
 </html>
+
 
