@@ -71,6 +71,7 @@ button {
     <div id="options"></div>
     <div id="feedback" class="feedback"></div>
     <button onclick="sendScore()">📤 Enviar score por correo</button>
+    <button id="exitBtn" onclick="backToMenu()" style="display:none;"> 🚪 Salir al menú </button>
 </div>
     
 
@@ -179,7 +180,9 @@ function backToMenu() {
     document.getElementById("menu").style.display = "block";
     document.getElementById("feedback").innerText = "";
     document.getElementById("modeLabel").innerText = "";
+
     document.querySelector('button[onclick="sendScore()"]').style.display = "none";
+    document.getElementById("exitBtn").style.display = "none";
 }
 
 // ---------- JUEGO ----------
@@ -251,12 +254,11 @@ if (lives === 0) {
     document.getElementById("feedback").innerHTML =
         "💀 <strong>Game Over</strong><br>Puedes enviar tu score antes de salir";
 
-    // MOSTRAR botón enviar score
     document.querySelector('button[onclick="sendScore()"]').style.display = "block";
+    document.getElementById("exitBtn").style.display = "block";
 
-    return; // ⛔ NO regresamos al menú aún
-}
-        }
+    return; // ⛔ detenemos el juego aquí
+}    }
     }
 
     setTimeout(loadWord, 1200);
@@ -265,6 +267,7 @@ if (lives === 0) {
 
 </body>
 </html>
+
 
 
 
