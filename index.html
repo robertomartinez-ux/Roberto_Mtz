@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard – Roberto</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #020617, #0f172a);
+        color: #e5e7eb;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        max-width: 900px;
+        width: 100%;
+        padding: 30px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2rem;
+    }
+
+    p.subtitle {
+        text-align: center;
+        margin-bottom: 40px;
+        color: #94a3b8;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+    }
+
+    .card {
+        background: #020617;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.5);
+        transition: transform .25s ease, box-shadow .25s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(0,0,0,.7);
+    }
+
+    .icon {
+        font-size: 2.2rem;
+        margin-bottom: 15px;
+    }
+
+    .card h3 {
+        margin: 0 0 10px;
+    }
+
+    .card p {
+        font-size: 14px;
+        color: #94a3b8;
+    }
+
+    footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 13px;
+        color: #64748b;
+    }
+</style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>🚀 Dashboard</h1>
+    <p class="subtitle">Herramientas & prácticas de networking y estudio</p>
+
+    <div class="grid">
+
+        <a class="card" href="subneteo.html">
+            <div class="icon">🧮</div>
+            <h3>Subnet Calculator</h3>
+            <p>Calculadora de subneteo IPv4 con CIDR.</p>
+        </a>
+
+        <a class="card" href="hsk1.html">
+            <div class="icon">🇨🇳</div>
+            <h3>HSK1 Quiz</h3>
+            <p>Entrenamiento interactivo para vocabulario HSK1.</p>
+        </a>
+
+        <!-- FUTURO -->
+        <div class="card" style="opacity:.4; cursor:not-allowed;">
+            <div class="icon">📐</div>
+            <h3>VLSM</h3>
+            <p>Próximamente.</p>
+        </div>
+
+        <div class="card" style="opacity:.4; cursor:not-allowed;">
+            <div class="icon">🧠</div>
+            <h3>CIDR Trainer</h3>
+            <p>Próximamente.</p>
+        </div>
+
+    </div>
+
+    <footer>
+        © 2026 · Roberto Martínez · GitHub Pages
+    </footer>
+
+</div>
+</body>
+</html>
