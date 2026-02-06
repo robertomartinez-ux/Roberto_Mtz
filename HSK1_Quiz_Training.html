@@ -36,6 +36,30 @@ button {
 .wrong { background:#F44336; color:white; }
 .char { font-size: 56px; }
 .pinyin { color:#555; margin-bottom:10px; }
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  border-color: #6c63ff;
+}
+
+#nameScreen h3 {
+  margin-bottom: 12px;
+}
+.primary {
+  background: #6c63ff;
+  color: white;
+  border: none;
+}
+  
 </style>
 </head>
 
@@ -57,9 +81,15 @@ button {
 <!-- PEDIR NOMBRE -->
 <div class="card" id="nameScreen" style="display:none">
   <h3>🧑 Tu nombre</h3>
-  <input id="playerName" placeholder="Escribe tu nombre"
-    style="width:100%;padding:12px;border-radius:8px;margin-bottom:10px">
-  <button onclick="confirmName()">Comenzar</button>
+<input
+  id="playerName"
+  placeholder="Escribe tu nombre"
+  maxlength="12"
+  autofocus
+  style="width:100%;padding:12px;border-radius:8px;margin-bottom:10px">
+
+
+  <button class="primary" onclick="confirmName()">Comenzar</button>
   <button onclick="backToMenu()">Cancelar</button>
 </div>
 
@@ -257,10 +287,16 @@ const livesEl = document.getElementById("lives");
 const modeLabel = document.getElementById("modeLabel");
 const exitBtn = document.getElementById("exitBtn");
 const playerNameInput = document.getElementById("playerName");
+playerNameInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    confirmName();
+  }
+});
 </script>
 
 </body>
 </html>
+
 
 
 
