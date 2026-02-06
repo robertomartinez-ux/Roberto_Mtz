@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Trivia Excel – Examen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: white;
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+    }
+    h1 { color: #38bdf8; }
+
+    .card {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 500px;
+        margin: auto;
+    }
+
+    input, button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 6px;
+        border: none;
+        font-size: 16px;
+    }
+
+    button {
+        background: #38bdf8;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: #0ea5e9;
+    }
+
+    .option {
+        background: #334155;
+        margin: 8px 0;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .option:hover {
+        background: #475569;
+    }
+
+    .hidden { display: none; }
+
+    .ranking li {
+        text-align: left;
+        margin: 5px 0;
+    }
+</style>
+</head>
+<body>
+
+<h1>🏆 Trivia Excel – Examen</h1>
+
+<!-- RANKING -->
+<div class="card">
+    <h2>🥇 Top 3</h2>
+    <ol id="ranking" class="ranking"></ol>
+</div>
+
+<br>
+
+<!-- LOGIN -->
+<div class="card" id="login">
+    <h2>Ingresa tu nombre</h2>
+    <input type="text" id="username" placeholder="Tu nombre">
+    <button onclick="startQuiz()">Comenzar</button>
+</div>
+
+<!-- QUIZ -->
+<div class="card hidden" id="quiz">
+    <h2 id="question"></h2>
+    <div id="options"></div>
+</div>
+
+<!-- RESULTADO -->
+<div class="card hidden" id="result">
+    <h2 id="finalScore"></h2>
+    <button onclick="location.reload()">Volver a jugar</button>
+</div>
+
+<script>
+const questions = [
+
+/* 🟢 NIVEL 1 – BÁSICO */
+
+{
+    q: "¿Qué fórmula devuelve la suma de las celdas A1 a A10?",
+    options: ["=SUM(A1:A10)", "=SUMA(A1:A10)", "=CONTAR(A1:A10)", "=TOTAL(A1:A10)"],
+    answer: 1
+},
+{
+    q: "¿Qué fórmula devuelve el promedio de las celdas A1 a A10?",
+    options: ["=SUMA(A1:A10)", "=PROMEDIO(A1:A10)", "=MEDIA(A1:A10)", "=CONTAR(A1:A10)"],
+    answer: 1
+},
+{
+    q: "¿Qué función cuenta solo celdas con números?",
+    options: ["CONTARA", "CONTAR", "SUMA", "PROMEDIO"],
+    answer: 1
+},
+{
+    q: "¿Qué función devuelve la fecha actual sin hora?",
+    options: ["AHORA()", "FECHA()", "HOY()", "DIA()"],
+    answer: 2
+},
+{
+    q: "¿Qué función devuelve la fecha y hora actuales?",
+    options: ["TIEMPO()", "HORA()", "HOY()", "AHORA()"],
+    answer: 3
+},
+
+/* 🟡 NIVEL 2 – INTERMEDIO */
+
+{
+    q: "¿Qué fórmula devuelve 'Aprobado' si A1 ≥ 70 y 'Reprobado' si no?",
+    options: [
+        "=SI(A1>70,\"Aprobado\",\"Reprobado\")",
+        "=SI(A1>=70,\"Aprobado\",\"Reprobado\")",
+        "=SI(A1=70,\"Aprobado\",\"Reprobado\")",
+        "=CONDICION(A1>=70)"
+    ],
+    answer: 1
+},
+{
+    q: "¿Qué función evita errores como #N/A?",
+    options: ["SI", "ERROR", "SI.ERROR", "NO.ERROR"],
+    answer: 2
+},
+{
+    q: "¿Qué función devuelve los primeros caracteres de un texto?",
+    options: ["DERECHA", "EXTRAE", "IZQUIERDA", "LARGO"],
+    answer: 2
+},
+{
+    q: "¿Qué función devuelve la cantidad de caracteres de un texto?",
+    options: ["EXTRAE", "CONTAR", "LARGO", "TEXTO"],
+    answer: 2
+},
+{
+    q: "¿Qué función une textos usando un delimitador?",
+    options: ["CONCAT", "UNIRCADENAS", "PEGAR", "SUMA"],
+    answer: 1
+},
+
+/* 🔵 NIVEL 3 – BÚSQUEDA Y REFERENCIA */
+
+{
+    q: "¿Qué función reemplaza a BUSCARV y BUSCARH?",
+    options: ["INDICE", "COINCIDIR", "BUSCARX", "DESREF"],
+    answer: 2
+},
+{
+    q: "¿Qué ventaja tiene BUSCARX sobre BUSCARV?",
+    options: [
+        "Es más rápido",
+        "Busca solo a la derecha",
+        "No necesita columna índice",
+        "Puede buscar en cualquier dirección"
+    ],
+    answer: 3
+},
+{
+    q: "¿Qué función devuelve la posición de un valor en un rango?",
+    options: ["BUSCARV", "COINCIDIR", "INDICE", "DESREF"],
+    answer: 1
+},
+{
+    q: "¿Para qué se usa el símbolo $ en Excel?",
+    options: [
+        "Para sumar",
+        "Para bloquear referencias de celda",
+        "Para concatenar",
+        "Para convertir texto"
+    ],
+    answer: 1
+},
+{
+    q: "¿Qué combinación permite búsquedas avanzadas?",
+    options: [
+        "SUMA + SI",
+        "INDICE + COINCIDIR",
+        "BUSCARV + CONTAR",
+        "DESREF + MAX"
+    ],
+    answer: 1
+},
+
+/* 🔴 NIVEL 4 – ANÁLISIS Y BASES DE DATOS */
+
+{
+    q: "¿Qué función suma valores según una condición?",
+    options: ["SUMA", "SUMAR.SI", "SUMAR", "CONTAR.SI"],
+    answer: 1
+},
+{
+    q: "¿Qué función permite múltiples condiciones para sumar?",
+    options: [
+        "SUMAR.SI",
+        "SUMA.CONJUNTO",
+        "SUMAR.SI.CONJUNTO",
+        "SUMA.MULTIPLE"
+    ],
+    answer: 2
+},
+{
+    q: "¿Qué función devuelve solo valores únicos?",
+    options: ["ORDENAR", "FILTRAR", "UNICOS", "CONTAR.SI"],
+    answer: 2
+},
+{
+    q: "¿Qué función filtra datos según una condición?",
+    options: ["ORDENAR", "FILTRAR", "BUSCARX", "SUMAR.SI"],
+    answer: 1
+},
+{
+    q: "¿Cuál fórmula suma ventas del año 2025 del vendedor 'Luis'?",
+    options: [
+        "=SUMAR.SI(A:A,2025,B:B)",
+        "=SUMAR.SI.CONJUNTO(B:B,A:A,2025,C:C,\"Luis\")",
+        "=SUMA(B:B,A:A)",
+        "=CONTAR.SI(A:A,2025)"
+    ],
+    answer: 1
+}
+
+];
+
+
+let current = 0;
+let score = 0;
+let player = "";
+
+function startQuiz() {
+    player = document.getElementById("username").value.trim();
+    if (!player) return alert("Escribe tu nombre");
+
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("quiz").classList.remove("hidden");
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = questions[current];
+    document.getElementById("question").innerText = q.q;
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach((opt, i) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerText = opt;
+        div.onclick = () => checkAnswer(i);
+        optionsDiv.appendChild(div);
+    });
+}
+
+function checkAnswer(i) {
+    if (i === questions[current].answer) score += 10;
+    current++;
+
+    if (current < questions.length) {
+        showQuestion();
+    } else {
+        endQuiz();
+    }
+}
+
+function endQuiz() {
+    document.getElementById("quiz").classList.add("hidden");
+    document.getElementById("result").classList.remove("hidden");
+    document.getElementById("finalScore").innerText =
+        `${player}, tu puntaje es ${score}`;
+
+    saveScore();
+    loadRanking();
+}
+
+function saveScore() {
+    let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+    ranking.push({ name: player, score });
+    ranking.sort((a, b) => b.score - a.score);
+    ranking = ranking.slice(0, 3);
+    localStorage.setItem("ranking", JSON.stringify(ranking));
+}
+
+function loadRanking() {
+    const ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+    const list = document.getElementById("ranking");
+    list.innerHTML = "";
+    ranking.forEach(r =>
+        list.innerHTML += `<li>${r.name} – ${r.score} pts</li>`
+    );
+}
+
+loadRanking();
+</script>
+
+</body>
+</html>
