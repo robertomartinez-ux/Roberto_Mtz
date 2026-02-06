@@ -4,101 +4,129 @@
 <meta charset="UTF-8">
 <title>Trivia Excel – Examen</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
+/* ===== RESET / BASE ===== */
 body {
+    margin: 0;
     min-height: 100vh;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background: linear-gradient(135deg, #020617, #0f172a);
     color: #e5e7eb;
-    margin: 0;
 }
-h1 {
+
+/* ===== LAYOUT ===== */
+.container {
+    max-width: 720px;
+    width: 100%;
+    margin: 40px auto 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1, h2 {
+    text-align: center;
     margin-top: 0;
 }
 
+/* ===== CARDS ===== */
 .card {
+    background: #020617;
+    padding: 20px;
+    border-radius: 16px;
     margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.4);
 }
+
+/* ===== INPUTS / BUTTONS ===== */
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+input {
+    background: #f8fafc;
+}
+
+button {
+    background: #38bdf8;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #0ea5e9;
+}
+
+/* ===== QUIZ OPTIONS ===== */
+.option {
+    background: #334155;
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.option:hover {
+    background: #475569;
+}
+
+/* ===== UTIL ===== */
+.hidden {
+    display: none;
+}
+
+.ranking li {
+    text-align: left;
+    margin: 6px 0;
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
     .container {
         margin-top: 20px;
     }
 }
-    input, button {
-        width: 100%;
-        padding: 10px;
-        margin-top: 10px;
-        border-radius: 6px;
-        border: none;
-        font-size: 16px;
-    }
-
-    button {
-        background: #38bdf8;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    button:hover {
-        background: #0ea5e9;
-    }
-
-    .option {
-        background: #334155;
-        margin: 8px 0;
-        padding: 10px;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .option:hover {
-        background: #475569;
-    }
-
-    .hidden { display: none; }
-
-    .ranking li {
-        text-align: left;
-        margin: 5px 0;
-    }
-    .container {
-    max-width: 720px;
-    width: 100%;
-    margin: 40px auto 0; /* 👈 empieza arriba */
-    padding: 20px;
-    box-sizing: border-box;
-}
 </style>
 </head>
+
 <body>
 
-<h1>🏆 Trivia Excel – Examen</h1>
+<div class="container">
 
-<!-- RANKING -->
-<div class="card">
-    <h2>🥇 Top 3</h2>
-    <ol id="ranking" class="ranking"></ol>
-</div>
+    <h1>🏆 Trivia Excel – Examen</h1>
 
-<br>
+    <!-- TOP 3 -->
+    <div class="card">
+        <h2>🥇 Top 3</h2>
+        <ol id="ranking" class="ranking"></ol>
+    </div>
 
-<!-- LOGIN -->
-<div class="card" id="login">
-    <h2>Ingresa tu nombre</h2>
-    <input type="text" id="username" placeholder="Tu nombre">
-    <button onclick="startQuiz()">Comenzar</button>
-</div>
+    <!-- LOGIN -->
+    <div class="card" id="login">
+        <h2>Ingresa tu nombre</h2>
+        <input type="text" id="username" placeholder="Tu nombre">
+        <button onclick="startQuiz()">Comenzar</button>
+    </div>
 
-<!-- QUIZ -->
-<div class="card hidden" id="quiz">
-    <h2 id="question"></h2>
-    <div id="options"></div>
-</div>
+    <!-- QUIZ -->
+    <div class="card hidden" id="quiz">
+        <h2 id="question"></h2>
+        <div id="options"></div>
+    </div>
 
-<!-- RESULTADO -->
-<div class="card hidden" id="result">
-    <h2 id="finalScore"></h2>
-    <button onclick="location.reload()">Volver a jugar</button>
+    <!-- RESULTADO -->
+    <div class="card hidden" id="result">
+        <h2 id="finalScore"></h2>
+        <button onclick="location.reload()">Volver a jugar</button>
+    </div>
+
 </div>
 
 <script>
@@ -248,7 +276,6 @@ const questions = [
 
 ];
 
-
 let current = 0;
 let score = 0;
 let player = "";
@@ -280,20 +307,13 @@ function showQuestion() {
 function checkAnswer(i) {
     if (i === questions[current].answer) score += 10;
     current++;
-
-    if (current < questions.length) {
-        showQuestion();
-    } else {
-        endQuiz();
-    }
+    current < questions.length ? showQuestion() : endQuiz();
 }
 
 function endQuiz() {
     document.getElementById("quiz").classList.add("hidden");
     document.getElementById("result").classList.remove("hidden");
-    document.getElementById("finalScore").innerText =
-        `${player}, tu puntaje es ${score}`;
-
+    document.getElementById("finalScore").innerText = `${player}, tu puntaje es ${score}`;
     saveScore();
     loadRanking();
 }
@@ -301,8 +321,8 @@ function endQuiz() {
 function saveScore() {
     let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
     ranking.push({ name: player, score });
-    ranking.sort((a, b) => b.score - a.score);
-    ranking = ranking.slice(0, 3);
+    ranking.sort((a,b) => b.score - a.score);
+    ranking = ranking.slice(0,3);
     localStorage.setItem("ranking", JSON.stringify(ranking));
 }
 
@@ -310,14 +330,11 @@ function loadRanking() {
     const ranking = JSON.parse(localStorage.getItem("ranking")) || [];
     const list = document.getElementById("ranking");
     list.innerHTML = "";
-    ranking.forEach(r =>
-        list.innerHTML += `<li>${r.name} – ${r.score} pts</li>`
-    );
+    ranking.forEach(r => list.innerHTML += `<li>${r.name} – ${r.score} pts</li>`);
 }
 
 loadRanking();
 </script>
 
 </body>
-
 </html>
