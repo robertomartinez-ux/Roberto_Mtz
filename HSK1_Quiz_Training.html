@@ -251,6 +251,8 @@ function backToMenu() {
 
     document.querySelector('button[onclick="sendScore()"]').style.display = "none";
     document.getElementById("exitBtn").style.display = "none";
+
+    loadRanking(); // 🔥 recargar ranking al volver
 }
 
 // ---------- JUEGO ----------
@@ -336,6 +338,7 @@ if (lives === 0) {
 
 </body>
 </html>
+
 
 
 
