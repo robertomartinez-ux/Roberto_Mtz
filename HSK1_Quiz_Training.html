@@ -6,343 +6,186 @@
 <title>HSK 1 – Quiz</title>
 
 <style>
-    .tiktok {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #555;
-}
-
-.tiktok a {
-    text-decoration: none;
-    color: #555;
-}
-
-.tiktok a:hover {
-    color: #000;
-}
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
 }
 .card {
-    background: white;
-    padding: 24px;
-    width: 100%;
-    max-width: 380px;
-    text-align: center;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-.char {
-    font-size: clamp(48px, 10vw, 64px);
-}
-.pinyin {
-    font-size: clamp(16px, 4vw, 20px);
-    color: #555;
-    margin-bottom: 20px;
+  background: white;
+  padding: 24px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 button {
-    width: 100%;
-    padding: 14px;
-    margin: 8px 0;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 8px;
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
 }
 .correct { background:#4CAF50; color:white; }
 .wrong { background:#F44336; color:white; }
-.feedback { margin-top:10px; font-size:14px; }
-#modeLabel { font-weight:bold; margin-bottom:10px; }
+.char { font-size: 56px; }
+.pinyin { color:#555; margin-bottom:10px; }
 </style>
 </head>
 
 <body>
 
-<!-- MENÚ -->
+<!-- MENU -->
 <div class="card" id="menu">
-    <h2>HSK 1</h2>
-    <h3>🏆 Ranking HSK1</h3>
-<ul id="ranking" style="list-style:none; padding:0;"></ul>
-<hr>
-    <p>Selecciona un modo</p>
-    <button onclick="startGame()">🎮 Juego</button>
-    <button onclick="startSurvival()">🔥 Supervivencia</button>
-    <button onclick="startSurvivalHard()">💀 Supervivencia HARD</button>
+  <h2>HSK 1</h2>
+
+  <input id="playerName" placeholder="Tu nombre"
+    style="width:100%;padding:12px;border-radius:8px;margin-bottom:10px">
+
+  <h3>🏆 Ranking</h3>
+  <ul id="ranking" style="list-style:none;padding:0"></ul>
+  <hr>
+
+  <button onclick="startGame()">🎮 Juego</button>
+  <button onclick="startSurvival()">🔥 Supervivencia</button>
+  <button onclick="startSurvivalHard()">💀 HARD</button>
 </div>
 
-<!-- JUEGO -->
+<!-- GAME -->
 <div class="card" id="game" style="display:none">
-    <div id="modeLabel"></div>
-    <button id="backBtn" onclick="backToMenu()">⬅️ Volver al menú</button>
-    <div id="lives">❤️❤️❤️</div>
-    <div id="score">✅ Aciertos: <strong>0</strong></div>
+  <div id="modeLabel"></div>
+  <div id="lives"></div>
+  <div id="score">Score: <strong>0</strong></div>
 
-    <div class="char" id="char"></div>
-    <div class="pinyin" id="pinyin"></div>
+  <div class="char" id="char"></div>
+  <div class="pinyin" id="pinyin"></div>
 
-    <div id="options"></div>
-    <div id="feedback" class="feedback"></div>
-    <button onclick="sendScore()">📤 Enviar score por correo</button>
-    <button id="exitBtn" onclick="backToMenu()" style="display:none;"> 🚪 Salir al menú </button>
-    <div class="tiktok" id="follow"> 👉 <a href="https://www.tiktok.com/@sistemasnovatos" target="_blank"> Sígueme en TikTok </a> </div>
+  <div id="options"></div>
+  <div id="feedback"></div>
+
+  <button id="exitBtn" onclick="backToMenu()" style="display:none">Salir</button>
 </div>
-    
 
-    
 <script type="module">
+/* 🔥 FIREBASE */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
-  getFirestore,
-  collection,
-  query,
-  orderBy,
-  limit,
-  getDocs
+  getFirestore, collection, query, orderBy, limit,
+  getDocs, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 🔥 TU CONFIG REAL DE FIREBASE */
 const firebaseConfig = {
-    apiKey: "AIzaSyDp8Pz5wM9qlkpJZrnaVYG2TeHswrp0NP4",
-    authDomain: "hsk1quiz.firebaseapp.com",
-    projectId: "hsk1quiz",
-    storageBucket: "hsk1quiz.firebasestorage.app",
-    messagingSenderId: "914453916513",
-    appId: "1:914453916513:web:fd0a68a4773c64c1f7f320",
-    measurementId: "G-E5CLMW2REX"
-  };
+  apiKey: "AIzaSyDp8Pz5wM9qlkpJZrnaVYG2TeHswrp0NP4",
+  authDomain: "hsk1quiz.firebaseapp.com",
+  projectId: "hsk1quiz",
+  storageBucket: "hsk1quiz.firebasestorage.app",
+  messagingSenderId: "914453916513",
+  appId: "1:914453916513:web:fd0a68a4773c64c1f7f320"
+};
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /* 🏆 RANKING */
 async function loadRanking() {
-  const q = query(
-    collection(db, "scores"),
-    orderBy("score", "desc"),
-    orderBy("createdAt", "asc"),
-    limit(3)
-  );
-
-  const snapshot = await getDocs(q);
-  const ranking = document.getElementById("ranking");
+  const q = query(collection(db,"scores"),orderBy("score","desc"),limit(3));
+  const snap = await getDocs(q);
   ranking.innerHTML = "";
+  snap.forEach((d,i)=>{
+    ranking.innerHTML += `<li>${["🥇","🥈","🥉"][i]} ${d.data().name} - ${d.data().score}</li>`;
+  });
+}
+loadRanking();
 
-  snapshot.forEach((doc, index) => {
-    const { name, score } = doc.data();
-    const medal = ["🥇","🥈","🥉"][index] || "";
-    ranking.innerHTML += `
-      <li>${medal} ${name} – ${score}</li>
-    `;
+/* GAME STATE */
+let playerName="", mode="", lives=3, score=0, current;
+const words=[
+  {c:"爱",p:"ài",m:"amar"},{c:"八",p:"bā",m:"ocho"},{c:"爸爸",p:"bàba",m:"papá"}, {c:"杯子",p:"bēizi",m:"vaso"},{c:"北京",p:"Běijīng",m:"Pekín"}, {c:"本",p:"běn",m:"libro / cuaderno"},{c:"不",p:"bù",m:"no"}, {c:"不客气",p:"bú kèqi",m:"de nada"},{c:"菜",p:"cài",m:"platillo"}, {c:"茶",p:"chá",m:"té"},{c:"吃",p:"chī",m:"comer"}, {c:"出租车",p:"chūzūchē",m:"taxi"},{c:"打电话",p:"dǎ diànhuà",m:"llamar"}, {c:"大",p:"dà",m:"grande"},{c:"的",p:"de",m:"posesivo"}, {c:"点",p:"diǎn",m:"hora / punto"},{c:"电脑",p:"diànnǎo",m:"computadora"}, {c:"电视",p:"diànshì",m:"televisión"},{c:"电影",p:"diànyǐng",m:"película"}, {c:"东西",p:"dōngxi",m:"cosa"},{c:"都",p:"dōu",m:"todos"}, {c:"读",p:"dú",m:"leer"},{c:"对不起",p:"duìbuqǐ",m:"lo siento"}, {c:"多",p:"duō",m:"mucho"},{c:"多少",p:"duōshao",m:"cuánto"}, {c:"儿子",p:"érzi",m:"hijo"},{c:"二",p:"èr",m:"dos"}, {c:"饭店",p:"fàndiàn",m:"restaurante"},{c:"飞机",p:"fēijī",m:"avión"}, {c:"分钟",p:"fēnzhōng",m:"minuto"},{c:"高兴",p:"gāoxìng",m:"feliz"}, {c:"个",p:"gè",m:"clasificador"},{c:"工作",p:"gōngzuò",m:"trabajo"}, {c:"狗",p:"gǒu",m:"perro"},{c:"汉语",p:"Hànyǔ",m:"chino"}, {c:"好",p:"hǎo",m:"bueno"},{c:"号",p:"hào",m:"número"}, {c:"喝",p:"hē",m:"beber"},{c:"和",p:"hé",m:"y"}, {c:"很",p:"hěn",m:"muy"},{c:"后面",p:"hòumian",m:"detrás"}, {c:"回",p:"huí",m:"volver"},{c:"会",p:"huì",m:"saber / poder"}, {c:"火车站",p:"huǒchēzhàn",m:"estación de tren"}, {c:"几",p:"jǐ",m:"cuántos"},{c:"家",p:"jiā",m:"casa"}, {c:"叫",p:"jiào",m:"llamarse"},{c:"今天",p:"jīntiān",m:"hoy"}, {c:"九",p:"jiǔ",m:"nueve"},{c:"开",p:"kāi",m:"abrir"}, {c:"看",p:"kàn",m:"ver"},{c:"看见",p:"kànjiàn",m:"ver (lograr ver)"}, {c:"块",p:"kuài",m:"moneda"},{c:"来",p:"lái",m:"venir"}, {c:"老师",p:"lǎoshī",m:"maestro"},{c:"了",p:"le",m:"partícula"}, {c:"冷",p:"lěng",m:"frío"},{c:"里",p:"lǐ",m:"dentro"}, {c:"六",p:"liù",m:"seis"},{c:"妈妈",p:"māma",m:"mamá"}, {c:"吗",p:"ma",m:"pregunta"},{c:"买",p:"mǎi",m:"comprar"}, {c:"猫",p:"māo",m:"gato"},{c:"没",p:"méi",m:"no (pasado)"}, {c:"没关系",p:"méi guānxi",m:"no pasa nada"}, {c:"米饭",p:"mǐfàn",m:"arroz"},{c:"名字",p:"míngzi",m:"nombre"}, {c:"明天",p:"míngtiān",m:"mañana"},{c:"哪",p:"nǎ",m:"cuál"}, {c:"哪儿",p:"nǎr",m:"dónde"},{c:"那",p:"nà",m:"ese"}, {c:"那儿",p:"nàr",m:"allí"},{c:"呢",p:"ne",m:"partícula"}, {c:"能",p:"néng",m:"poder"},{c:"你",p:"nǐ",m:"tú"}, {c:"年",p:"nián",m:"año"},{c:"女儿",p:"nǚ’ér",m:"hija"}, {c:"朋友",p:"péngyou",m:"amigo"},{c:"漂亮",p:"piàoliang",m:"bonito"}, {c:"苹果",p:"píngguǒ",m:"manzana"},{c:"七",p:"qī",m:"siete"}, {c:"钱",p:"qián",m:"dinero"},{c:"前面",p:"qiánmian",m:"delante"}, {c:"请",p:"qǐng",m:"por favor"},{c:"去",p:"qù",m:"ir"}, {c:"热",p:"rè",m:"caliente"},{c:"人",p:"rén",m:"persona"}, {c:"认识",p:"rènshi",m:"conocer"},{c:"日",p:"rì",m:"día"}, {c:"三",p:"sān",m:"tres"},{c:"商店",p:"shāngdiàn",m:"tienda"}, {c:"上",p:"shàng",m:"arriba"},{c:"上午",p:"shàngwǔ",m:"mañana AM"}, {c:"少",p:"shǎo",m:"poco"},{c:"谁",p:"shéi",m:"quién"}, {c:"什么",p:"shénme",m:"qué"},{c:"十",p:"shí",m:"diez"}, {c:"时候",p:"shíhou",m:"momento"},{c:"是",p:"shì",m:"ser / estar"}, {c:"书",p:"shū",m:"libro"},{c:"水",p:"shuǐ",m:"agua"}, {c:"水果",p:"shuǐguǒ",m:"fruta"},{c:"睡觉",p:"shuìjiào",m:"dormir"}, {c:"说",p:"shuō",m:"hablar"},{c:"四",p:"sì",m:"cuatro"}, {c:"岁",p:"suì",m:"años"},{c:"他",p:"tā",m:"él"}, {c:"她",p:"tā",m:"ella"},{c:"太",p:"tài",m:"demasiado"}, {c:"天气",p:"tiānqì",m:"clima"},{c:"听",p:"tīng",m:"escuchar"}, {c:"同学",p:"tóngxué",m:"compañero"},{c:"喂",p:"wèi",m:"hola teléfono"}, {c:"我",p:"wǒ",m:"yo"},{c:"我们",p:"wǒmen",m:"nosotros"}, {c:"五",p:"wǔ",m:"cinco"},{c:"喜欢",p:"xǐhuan",m:"gustar"}, {c:"下",p:"xià",m:"abajo"},{c:"下午",p:"xiàwǔ",m:"tarde"}, {c:"下雨",p:"xiàyǔ",m:"llover"},{c:"先生",p:"xiānsheng",m:"señor"}, {c:"现在",p:"xiànzài",m:"ahora"},{c:"想",p:"xiǎng",m:"querer / pensar"}, {c:"小",p:"xiǎo",m:"pequeño"},{c:"小姐",p:"xiǎojiě",m:"señorita"}, {c:"写",p:"xiě",m:"escribir"},{c:"谢谢",p:"xièxie",m:"gracias"}, {c:"星期",p:"xīngqī",m:"semana"},{c:"学生",p:"xuésheng",m:"estudiante"}, {c:"学习",p:"xuéxí",m:"estudiar"},{c:"学校",p:"xuéxiào",m:"escuela"}, {c:"一",p:"yī",m:"uno"},{c:"衣服",p:"yīfu",m:"ropa"}, {c:"医生",p:"yīshēng",m:"doctor"},{c:"医院",p:"yīyuàn",m:"hospital"}, {c:"椅子",p:"yǐzi",m:"silla"},{c:"有",p:"yǒu",m:"tener"}, {c:"月",p:"yuè",m:"mes"},{c:"再见",p:"zàijiàn",m:"adiós"}, {c:"在",p:"zài",m:"estar en"},{c:"怎么",p:"zěnme",m:"cómo"}, {c:"怎么样",p:"zěnmeyàng",m:"qué tal"}, {c:"这",p:"zhè",m:"este"},{c:"这儿",p:"zhèr",m:"aquí"}, {c:"中国",p:"Zhōngguó",m:"China"},{c:"中午",p:"zhōngwǔ",m:"mediodía"}, {c:"住",p:"zhù",m:"vivir"},{c:"桌子",p:"zhuōzi",m:"mesa"}, {c:"字",p:"zì",m:"carácter"},{c:"昨天",p:"zuótiān",m:"ayer"},{c:"5:30",p:"Wǔ diǎn bàn",m:"五点半"} ];
+
+/* SAVE SCORE */
+async function saveScore(){
+  if(!playerName||score<=0)return;
+  await addDoc(collection(db,"scores"),{
+    name:playerName,score,createdAt:serverTimestamp()
   });
 }
 
-loadRanking();
-let mode = "";
-let difficulty = "normal";
-let lives = 3;
-let score = 0;
-let current;
-let usedWords = [];
+/* START */
+function startGameBase(type){
+  const n=document.getElementById("playerName").value.trim();
+  if(!n){alert("Escribe tu nombre");return;}
+  playerName=n; mode=type; score=0; lives=3;
 
-const words = [
-{c:"爱",p:"ài",m:"amar"},{c:"八",p:"bā",m:"ocho"},{c:"爸爸",p:"bàba",m:"papá"}, {c:"杯子",p:"bēizi",m:"vaso"},{c:"北京",p:"Běijīng",m:"Pekín"}, {c:"本",p:"běn",m:"libro / cuaderno"},{c:"不",p:"bù",m:"no"}, {c:"不客气",p:"bú kèqi",m:"de nada"},{c:"菜",p:"cài",m:"platillo"}, {c:"茶",p:"chá",m:"té"},{c:"吃",p:"chī",m:"comer"}, {c:"出租车",p:"chūzūchē",m:"taxi"},{c:"打电话",p:"dǎ diànhuà",m:"llamar"}, {c:"大",p:"dà",m:"grande"},{c:"的",p:"de",m:"posesivo"}, {c:"点",p:"diǎn",m:"hora / punto"},{c:"电脑",p:"diànnǎo",m:"computadora"}, {c:"电视",p:"diànshì",m:"televisión"},{c:"电影",p:"diànyǐng",m:"película"}, {c:"东西",p:"dōngxi",m:"cosa"},{c:"都",p:"dōu",m:"todos"}, {c:"读",p:"dú",m:"leer"},{c:"对不起",p:"duìbuqǐ",m:"lo siento"}, {c:"多",p:"duō",m:"mucho"},{c:"多少",p:"duōshao",m:"cuánto"}, {c:"儿子",p:"érzi",m:"hijo"},{c:"二",p:"èr",m:"dos"}, {c:"饭店",p:"fàndiàn",m:"restaurante"},{c:"飞机",p:"fēijī",m:"avión"}, {c:"分钟",p:"fēnzhōng",m:"minuto"},{c:"高兴",p:"gāoxìng",m:"feliz"}, {c:"个",p:"gè",m:"clasificador"},{c:"工作",p:"gōngzuò",m:"trabajo"}, {c:"狗",p:"gǒu",m:"perro"},{c:"汉语",p:"Hànyǔ",m:"chino"}, {c:"好",p:"hǎo",m:"bueno"},{c:"号",p:"hào",m:"número"}, {c:"喝",p:"hē",m:"beber"},{c:"和",p:"hé",m:"y"}, {c:"很",p:"hěn",m:"muy"},{c:"后面",p:"hòumian",m:"detrás"}, {c:"回",p:"huí",m:"volver"},{c:"会",p:"huì",m:"saber / poder"}, {c:"火车站",p:"huǒchēzhàn",m:"estación de tren"}, {c:"几",p:"jǐ",m:"cuántos"},{c:"家",p:"jiā",m:"casa"}, {c:"叫",p:"jiào",m:"llamarse"},{c:"今天",p:"jīntiān",m:"hoy"}, {c:"九",p:"jiǔ",m:"nueve"},{c:"开",p:"kāi",m:"abrir"}, {c:"看",p:"kàn",m:"ver"},{c:"看见",p:"kànjiàn",m:"ver (lograr ver)"}, {c:"块",p:"kuài",m:"moneda"},{c:"来",p:"lái",m:"venir"}, {c:"老师",p:"lǎoshī",m:"maestro"},{c:"了",p:"le",m:"partícula"}, {c:"冷",p:"lěng",m:"frío"},{c:"里",p:"lǐ",m:"dentro"}, {c:"六",p:"liù",m:"seis"},{c:"妈妈",p:"māma",m:"mamá"}, {c:"吗",p:"ma",m:"pregunta"},{c:"买",p:"mǎi",m:"comprar"}, {c:"猫",p:"māo",m:"gato"},{c:"没",p:"méi",m:"no (pasado)"}, {c:"没关系",p:"méi guānxi",m:"no pasa nada"}, {c:"米饭",p:"mǐfàn",m:"arroz"},{c:"名字",p:"míngzi",m:"nombre"}, {c:"明天",p:"míngtiān",m:"mañana"},{c:"哪",p:"nǎ",m:"cuál"}, {c:"哪儿",p:"nǎr",m:"dónde"},{c:"那",p:"nà",m:"ese"}, {c:"那儿",p:"nàr",m:"allí"},{c:"呢",p:"ne",m:"partícula"}, {c:"能",p:"néng",m:"poder"},{c:"你",p:"nǐ",m:"tú"}, {c:"年",p:"nián",m:"año"},{c:"女儿",p:"nǚ’ér",m:"hija"}, {c:"朋友",p:"péngyou",m:"amigo"},{c:"漂亮",p:"piàoliang",m:"bonito"}, {c:"苹果",p:"píngguǒ",m:"manzana"},{c:"七",p:"qī",m:"siete"}, {c:"钱",p:"qián",m:"dinero"},{c:"前面",p:"qiánmian",m:"delante"}, {c:"请",p:"qǐng",m:"por favor"},{c:"去",p:"qù",m:"ir"}, {c:"热",p:"rè",m:"caliente"},{c:"人",p:"rén",m:"persona"}, {c:"认识",p:"rènshi",m:"conocer"},{c:"日",p:"rì",m:"día"}, {c:"三",p:"sān",m:"tres"},{c:"商店",p:"shāngdiàn",m:"tienda"}, {c:"上",p:"shàng",m:"arriba"},{c:"上午",p:"shàngwǔ",m:"mañana AM"}, {c:"少",p:"shǎo",m:"poco"},{c:"谁",p:"shéi",m:"quién"}, {c:"什么",p:"shénme",m:"qué"},{c:"十",p:"shí",m:"diez"}, {c:"时候",p:"shíhou",m:"momento"},{c:"是",p:"shì",m:"ser / estar"}, {c:"书",p:"shū",m:"libro"},{c:"水",p:"shuǐ",m:"agua"}, {c:"水果",p:"shuǐguǒ",m:"fruta"},{c:"睡觉",p:"shuìjiào",m:"dormir"}, {c:"说",p:"shuō",m:"hablar"},{c:"四",p:"sì",m:"cuatro"}, {c:"岁",p:"suì",m:"años"},{c:"他",p:"tā",m:"él"}, {c:"她",p:"tā",m:"ella"},{c:"太",p:"tài",m:"demasiado"}, {c:"天气",p:"tiānqì",m:"clima"},{c:"听",p:"tīng",m:"escuchar"}, {c:"同学",p:"tóngxué",m:"compañero"},{c:"喂",p:"wèi",m:"hola teléfono"}, {c:"我",p:"wǒ",m:"yo"},{c:"我们",p:"wǒmen",m:"nosotros"}, {c:"五",p:"wǔ",m:"cinco"},{c:"喜欢",p:"xǐhuan",m:"gustar"}, {c:"下",p:"xià",m:"abajo"},{c:"下午",p:"xiàwǔ",m:"tarde"}, {c:"下雨",p:"xiàyǔ",m:"llover"},{c:"先生",p:"xiānsheng",m:"señor"}, {c:"现在",p:"xiànzài",m:"ahora"},{c:"想",p:"xiǎng",m:"querer / pensar"}, {c:"小",p:"xiǎo",m:"pequeño"},{c:"小姐",p:"xiǎojiě",m:"señorita"}, {c:"写",p:"xiě",m:"escribir"},{c:"谢谢",p:"xièxie",m:"gracias"}, {c:"星期",p:"xīngqī",m:"semana"},{c:"学生",p:"xuésheng",m:"estudiante"}, {c:"学习",p:"xuéxí",m:"estudiar"},{c:"学校",p:"xuéxiào",m:"escuela"}, {c:"一",p:"yī",m:"uno"},{c:"衣服",p:"yīfu",m:"ropa"}, {c:"医生",p:"yīshēng",m:"doctor"},{c:"医院",p:"yīyuàn",m:"hospital"}, {c:"椅子",p:"yǐzi",m:"silla"},{c:"有",p:"yǒu",m:"tener"}, {c:"月",p:"yuè",m:"mes"},{c:"再见",p:"zàijiàn",m:"adiós"}, {c:"在",p:"zài",m:"estar en"},{c:"怎么",p:"zěnme",m:"cómo"}, {c:"怎么样",p:"zěnmeyàng",m:"qué tal"}, {c:"这",p:"zhè",m:"este"},{c:"这儿",p:"zhèr",m:"aquí"}, {c:"中国",p:"Zhōngguó",m:"China"},{c:"中午",p:"zhōngwǔ",m:"mediodía"}, {c:"住",p:"zhù",m:"vivir"},{c:"桌子",p:"zhuōzi",m:"mesa"}, {c:"字",p:"zì",m:"carácter"},{c:"昨天",p:"zuótiān",m:"ayer"},{c:"5:30",p:"Wǔ diǎn bàn",m:"五点半"} ];
-
-
-// ---------- RECORDS ----------
-function saveBestScore(key, value) {
-    const best = localStorage.getItem(key);
-    if (!best || value > parseInt(best)) {
-        localStorage.setItem(key, value);
-    }
+  menu.style.display="none";
+  game.style.display="block";
+  scoreEl.innerHTML="Score: <strong>0</strong>";
+  livesEl.innerHTML= type==="game"?"":"❤️❤️❤️";
+  loadWord();
 }
-function sendScore() {
-    const subject = "Mi score HSK 1 🎮";
-    const body = `
-Mi resultado en HSK 1:
+window.startGame=()=>startGameBase("game");
+window.startSurvival=()=>startGameBase("survival");
+window.startSurvivalHard=()=>startGameBase("hard");
 
-Modo: ${mode}
-Dificultad: ${difficulty}
-Score: ${score}
+/* GAME LOGIC */
+function loadWord(){
+  current=words[Math.floor(Math.random()*words.length)];
+  char.innerText=current.c;
+  pinyin.innerText=current.p;
 
-¡Inténtalo tú también!
-`;
-
-    window.location.href =
-        "mailto:?subject=" +
-        encodeURIComponent(subject) +
-        "&body=" +
-        encodeURIComponent(body);
-}
-// ---------- MODOS ----------
-function startGame() {
-    mode = "game";
-    score = 0;
-
-    document.getElementById("modeLabel").innerText = "🎮 Juego";
-    document.getElementById("lives").style.display = "none";
-    document.getElementById("backBtn").style.display = "block";
-
-    document.querySelector("#score strong").innerText = score;
-    document.getElementById("menu").style.display = "none";
-    document.getElementById("game").style.display = "block";
-    document.querySelector('button[onclick="sendScore()"]').style.display = "block";
-    document.getElementById("follow").style.display = "block";
-
-    loadWord();
-}
-
-function startSurvival() {
-    mode = "survival";
-    difficulty = "normal";
-    lives = 3;
-    score = 0;
-    usedWords = [];
-
-    document.getElementById("modeLabel").innerText = "🔥 Supervivencia";
-    document.getElementById("lives").style.display = "block";
-    document.getElementById("backBtn").style.display = "none";
-
-    updateLives();
-    document.querySelector("#score strong").innerText = score;
-    document.getElementById("menu").style.display = "none";
-    document.getElementById("game").style.display = "block";
-    document.querySelector('button[onclick="sendScore()"]').style.display = "block";
-    document.getElementById("follow").style.display = "block";
-
-    loadWord();
-}
-
-function startSurvivalHard() {
-    mode = "survival";
-    difficulty = "hard";
-    lives = 3;
-    score = 0;
-    usedWords = [];
-
-    document.getElementById("modeLabel").innerText = "💀 HARD";
-    document.getElementById("lives").style.display = "block";
-    document.getElementById("backBtn").style.display = "none";
-
-    updateLives();
-    document.querySelector("#score strong").innerText = score;
-    document.getElementById("menu").style.display = "none";
-    document.getElementById("game").style.display = "block";
-    document.querySelector('button[onclick="sendScore()"]').style.display = "block";
-    document.getElementById("follow").style.display = "block";
-
-    loadWord();
-}
-
-// ---------- UI ----------
-function updateLives() {
-    document.getElementById("lives").innerText = "❤️".repeat(lives);
-}
-
-function backToMenu() {
-    document.getElementById("game").style.display = "none";
-    document.getElementById("menu").style.display = "block";
-    document.getElementById("feedback").innerText = "";
-    document.getElementById("modeLabel").innerText = "";
-
-    document.querySelector('button[onclick="sendScore()"]').style.display = "none";
-    document.getElementById("exitBtn").style.display = "none";
-
-    loadRanking(); // 🔥 recargar ranking al volver
-}
-
-// ---------- JUEGO ----------
-function loadWord() {
-
-    if (mode === "survival" && usedWords.length === words.length) {
-        alert(
-            difficulty === "hard"
-            ? "💀🏆 ¡Completaste HARD!"
-            : "🎉 ¡Completaste Supervivencia!"
-        );
-        backToMenu();
-        return;
-    }
-
-    const available = mode === "survival"
-        ? words.filter(w => !usedWords.includes(w))
-        : words;
-
-    current = available[Math.floor(Math.random() * available.length)];
-    if (mode === "survival") usedWords.push(current);
-
-    document.getElementById("char").innerText = current.c;
-    document.getElementById("pinyin").innerText =
-        (mode === "survival" && difficulty === "hard") ? "" : current.p;
-
-    const opts = [...words.map(w => w.m)]
-        .sort(() => 0.5 - Math.random())
-        .slice(0,3);
-
-    if (!opts.includes(current.m)) {
-        opts[0] = current.m;
-    }
-
-    const optionsDiv = document.getElementById("options");
-    const feedbackDiv = document.getElementById("feedback");
-    optionsDiv.innerHTML = "";
-    feedbackDiv.innerHTML = "";
-
-    opts.sort(() => 0.5 - Math.random()).forEach(opt => {
-        const btn = document.createElement("button");
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(btn, opt);
-        optionsDiv.appendChild(btn);
+  options.innerHTML="";
+  ["amar","ocho","papá","agua","libro","persona"]
+    .sort(()=>0.5-Math.random()).slice(0,3).concat(current.m)
+    .sort(()=>0.5-Math.random())
+    .forEach(o=>{
+      const b=document.createElement("button");
+      b.innerText=o;
+      b.onclick=()=>check(o,b);
+      options.appendChild(b);
     });
 }
 
-function checkAnswer(button, answer) {
-    document.querySelectorAll("#options button").forEach(b => b.disabled = true);
-    document.getElementById("follow").style.display = "none";
+function check(ans,btn){
+  if(ans===current.m){
+    btn.className="correct"; score++;
+  }else{
+    btn.className="wrong"; lives--;
+  }
+  scoreEl.innerHTML=`Score: <strong>${score}</strong>`;
+  livesEl.innerHTML="❤️".repeat(lives);
 
-    if (answer === current.m) {
-        button.className = "correct";
-        score++;
-        document.querySelector("#score strong").innerText = score;
-        document.getElementById("feedback").innerText = "✅ Correcto";
-
-        if (mode === "game") saveBestScore("best_game", score);
-        if (mode === "survival" && difficulty === "normal") saveBestScore("best_survival", score);
-        if (mode === "survival" && difficulty === "hard") saveBestScore("best_hard", score);
-
-    } else {
-        button.className = "wrong";
-        document.getElementById("feedback").innerText = "❌ Correcto: " + current.m;
-
-        if (mode === "survival") {
-            lives--;
-            updateLives();
-if (lives === 0) {
-    document.getElementById("feedback").innerHTML =
-        "💀 <strong>Game Over</strong><br>Puedes enviar tu score antes de salir";
-
-    document.querySelector('button[onclick="sendScore()"]').style.display = "block";
-    document.getElementById("exitBtn").style.display = "block";
-
-    return; // ⛔ detenemos el juego aquí
-}    }
-    }
-
-    setTimeout(loadWord, 1200);
+  if(mode!=="game" && lives===0){
+    saveScore();
+    exitBtn.style.display="block";
+    return;
+  }
+  setTimeout(loadWord,800);
 }
+
+/* BACK */
+window.backToMenu=()=>{
+  game.style.display="none";
+  menu.style.display="block";
+  exitBtn.style.display="none";
+  loadRanking();
+};
+
+/* DOM */
+const ranking=document.getElementById("ranking");
+const menu=document.getElementById("menu");
+const game=document.getElementById("game");
+const char=document.getElementById("char");
+const pinyin=document.getElementById("pinyin");
+const options=document.getElementById("options");
+const scoreEl=document.getElementById("score");
+const livesEl=document.getElementById("lives");
+const exitBtn=document.getElementById("exitBtn");
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
