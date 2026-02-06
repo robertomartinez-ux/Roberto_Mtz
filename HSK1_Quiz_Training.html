@@ -251,10 +251,10 @@ function loadWord() {
   if (mode === "survival") {
     usedWords.push(current);
 
-  if (mode === "survival") {
-  modeLabel.innerText =
-    (pendingMode === "hard" ? "💀 HARD" : "🔥 Supervivencia") +
-    ` (${usedWords.length}/${words.length})`;
+    // contador bonito
+    modeLabel.innerText =
+      (pendingMode === "hard" ? "💀 HARD" : "🔥 Supervivencia") +
+      ` (${usedWords.length}/${words.length})`;
   }
 
   char.innerText = current.c;
@@ -278,6 +278,7 @@ function loadWord() {
     options.appendChild(btn);
   });
 }
+
 
 
 function check(ans,btn) {
@@ -335,6 +336,7 @@ playerNameInput.addEventListener("keydown", (e) => {
 
 </body>
 </html>
+
 
 
 
