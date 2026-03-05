@@ -158,7 +158,8 @@ let completedZones = {
 saludos:false,
 familia:false,
 numeros:false,
-lugares:false
+lugares:false,
+boss:false
 
 }
 
@@ -305,8 +306,10 @@ let zoneQuestions=getQuestionsByZone(zone)
 
 let npcNumber=parseInt(npc.replace("npc",""))-1
 
-let start=npcNumber*6
-let end=start+6
+let questionsPerNPC=Math.ceil(zoneQuestions.length/4)
+
+let start=npcNumber*questionsPerNPC
+let end=start+questionsPerNPC
 
 return zoneQuestions.slice(start,end)
 
@@ -363,7 +366,17 @@ currentQuestion=npcQuestions[Math.floor(Math.random()*npcQuestions.length)]
 
 npcQuestions=getQuestionsByNPC(currentZone,currentNPC)
 
+if(npcQuestions.length===0){
+alert("No hay preguntas en esta zona")
+return
+}
+
 currentQuestion=npcQuestions[questionIndex]
+
+if(!currentQuestion){
+questionIndex=0
+currentQuestion=npcQuestions[questionIndex]
+}
 
 }
 
@@ -384,8 +397,10 @@ document.getElementById("answer").focus()
 function checkAnswer(){
 
 let user=document.getElementById("answer").value.trim().toLowerCase()
-
+  
+if(!currentQuestion) return
 let correct=currentQuestion.a.toLowerCase()
+  
 
 if(user==correct){
 
@@ -428,13 +443,23 @@ questionIndex++
 let npcQuestions
 
 if(currentZone=="boss"){
+
 npcQuestions=getQuestionsByZone("boss")
+
+if(npcQuestions.length===0){
+alert("No hay preguntas para el boss")
+return
+}
+
 }else{
+
 npcQuestions=getQuestionsByNPC(currentZone,currentNPC)
+
 }
 
 if(questionIndex>=npcQuestions.length){
-
+questionIndex=0
+}
 
 questionIndex=0
 
@@ -497,6 +522,8 @@ document.getElementById("bossHPbar").style.background="#dc2626"
 if(bossHP <= 0){
 
 alert("🏆 DERROTASTE AL MAESTRO WANG")
+completedZones.boss=true
+disableZone("boss")
 
 document.getElementById("game").style.display="none"
 document.getElementById("bossBar").style.display="none"
@@ -511,7 +538,7 @@ return
 
 /* ---------------- ENTER RESPONDE ---------------- */
 
-document.getElementById("answer").addEventListener("keypress",function(e){
+document.getElementById("answer").addEventListener("keydown",function(e){
 
 if(e.key==="Enter"){
 checkAnswer()
@@ -524,5 +551,6 @@ checkAnswer()
 </body>
 
 </html>
+
 
 
