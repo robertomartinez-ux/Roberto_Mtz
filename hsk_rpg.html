@@ -359,8 +359,7 @@ function loadQuestion(){
 
 if(currentZone=="boss"){
 
-currentQuestion =
-boss[Math.floor(Math.random()*boss.length)]
+currentQuestion = boss[questionIndex]
 
 }else{
 
@@ -423,13 +422,17 @@ questionIndex++
 
 let npcQuestions
 
-if(currentZone=="boss"){
-npcQuestions = boss
-}else{
-npcQuestions = zones[currentZone][currentNPC]
-}
-
 if(questionIndex >= npcQuestions.length){
+
+if(currentZone=="boss"){
+
+alert("🏆 DERROTASTE AL MAESTRO WANG")
+
+document.getElementById("game").style.display="none"
+
+return
+
+}
 
 questionIndex = 0
 
@@ -481,4 +484,5 @@ checkAnswer()
 </script>
 
 </body>
+
 </html>
