@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>HSK RPG</title>
 
 <style>
@@ -63,37 +66,16 @@ border-radius:8px;
 margin-top:15px;
 color:#4ade80;
 }
+
 @media (max-width:600px){
 
-body{
-padding:15px;
-}
+body{padding:15px}
 
-#game{
-padding:15px;
-}
+.zone{font-size:16px}
 
-h1{
-font-size:26px;
-}
+input{width:90%}
 
-h2{
-font-size:22px;
-}
-
-.zone{
-padding:15px;
-font-size:16px;
-}
-
-input{
-width:90%;
-max-width:none;
-}
-
-button{
-width:90%;
-}
+button{width:90%}
 
 }
 
@@ -139,256 +121,230 @@ width:90%;
 
 <script>
 
+/* ---------------- NPC NOMBRES ---------------- */
+
 let npcNames = {
+
 npc1:"Aldeano Li",
 npc2:"Estudiante Mei",
 npc3:"Maestro Chen",
 npc4:"Comerciante Wang"
+
 }
 
+/* ---------------- PROGRESO ---------------- */
+
 let completedZones = {
+
 saludos:false,
 familia:false,
 numeros:false,
 lugares:false
-}
-
-
-
-let xp = 0
-let level = 1
-
-let currentQuestion = {}
-let currentZone = ""
-let currentNPC = "npc1"
-let questionIndex = 0
-
-let zones = {
-
-saludos:{
-
-npc1:[
-{q:"¿Cómo se dice hola?",a:"你好"},
-{q:"¿Cómo se dice adiós?",a:"再见"},
-{q:"¿Cómo se dice gracias?",a:"谢谢"},
-{q:"¿Cómo se dice por favor?",a:"请"},
-{q:"¿Cómo se dice lo siento?",a:"对不起"},
-{q:"¿Cómo se dice hola otra vez?",a:"你好"}
-],
-
-npc2:[
-{q:"Ordena: 叫 / 你 / 什么 / 名字",a:"你叫什么名字"},
-{q:"¿Cómo dices 'me llamo Roberto'?",a:"我叫Roberto"},
-{q:"¿Cómo dices 'yo soy estudiante'?",a:"我是学生"},
-{q:"¿Cómo dices 'yo soy profesor'?",a:"我是老师"},
-{q:"¿Cómo dices 'él es mi amigo'?",a:"他是我的朋友"},
-{q:"¿Cómo dices 'ella es profesora'?",a:"她是老师"}
-],
-
-npc3:[
-{q:"¿Qué significa '朋友'?",a:"amigo"},
-{q:"¿Qué significa '中国'?",a:"china"},
-{q:"¿Qué significa '美国'?",a:"estados unidos"},
-{q:"¿Qué significa '学生'?",a:"estudiante"},
-{q:"¿Qué significa '老师'?",a:"profesor"},
-{q:"¿Qué significa '谢谢'?",a:"gracias"}
-],
-
-npc4:[
-{q:"Traduce: 你好",a:"hola"},
-{q:"Traduce: 谢谢你",a:"gracias"},
-{q:"Traduce: 再见",a:"adios"},
-{q:"Traduce: 我是学生",a:"soy estudiante"},
-{q:"Traduce: 她是老师",a:"ella es profesora"},
-{q:"Traduce: 他是我的朋友",a:"el es mi amigo"}
-]
-
-},
-
-familia:{
-
-npc1:[
-{q:"¿Cómo se dice mamá?",a:"妈妈"},
-{q:"¿Cómo se dice papá?",a:"爸爸"},
-{q:"¿Cómo se dice hijo?",a:"儿子"},
-{q:"¿Cómo se dice hija?",a:"女儿"},
-{q:"¿Cómo se dice hermano mayor?",a:"哥哥"},
-{q:"¿Cómo se dice hermana mayor?",a:"姐姐"}
-],
-
-npc2:[
-{q:"¿Qué significa 妈妈?",a:"mama"},
-{q:"¿Qué significa 爸爸?",a:"papa"},
-{q:"¿Qué significa 儿子?",a:"hijo"},
-{q:"¿Qué significa 女儿?",a:"hija"},
-{q:"¿Qué significa 哥哥?",a:"hermano"},
-{q:"¿Qué significa 姐姐?",a:"hermana"}
-],
-
-npc3:[
-{q:"Traduce: 我妈妈",a:"mi mama"},
-{q:"Traduce: 我爸爸",a:"mi papa"},
-{q:"Traduce: 他是我哥哥",a:"el es mi hermano"},
-{q:"Traduce: 她是我姐姐",a:"ella es mi hermana"},
-{q:"Traduce: 我有一个儿子",a:"tengo un hijo"},
-{q:"Traduce: 我有一个女儿",a:"tengo una hija"}
-],
-
-npc4:[
-{q:"Completa: 我___妈妈",a:"有"},
-{q:"Completa: 他是我___",a:"哥哥"},
-{q:"Completa: 她是我___",a:"姐姐"},
-{q:"Completa: 我有一个___",a:"儿子"},
-{q:"Completa: 我有一个___",a:"女儿"},
-{q:"Completa: 我___家人",a:"爱"}
-]
-},
-
-numeros:{
-
-npc1:[
-{q:"¿Cómo se dice uno?",a:"一"},
-{q:"¿Cómo se dice dos?",a:"二"},
-{q:"¿Cómo se dice tres?",a:"三"},
-{q:"¿Cómo se dice cuatro?",a:"四"},
-{q:"¿Cómo se dice cinco?",a:"五"},
-{q:"¿Cómo se dice diez?",a:"十"}
-],
-
-npc2:[
-{q:"¿Qué significa 一?",a:"uno"},
-{q:"¿Qué significa 二?",a:"dos"},
-{q:"¿Qué significa 三?",a:"tres"},
-{q:"¿Qué significa 四?",a:"cuatro"},
-{q:"¿Qué significa 五?",a:"cinco"},
-{q:"¿Qué significa 十?",a:"diez"}
-],
-
-npc3:[
-{q:"Traduce: 三个人",a:"tres personas"},
-{q:"Traduce: 五个学生",a:"cinco estudiantes"},
-{q:"Traduce: 十个人",a:"diez personas"},
-{q:"Traduce: 两个朋友",a:"dos amigos"},
-{q:"Traduce: 一个老师",a:"un profesor"},
-{q:"Traduce: 四个学生",a:"cuatro estudiantes"}
-],
-
-npc4:[
-{q:"Completa: 我有___个朋友 (3)",a:"三"},
-{q:"Completa: 我有___个学生 (5)",a:"五"},
-{q:"Completa: 我有___个老师 (2)",a:"二"},
-{q:"Completa: 今天有___个人 (4)",a:"四"},
-{q:"Completa: 这里有___个人 (10)",a:"十"},
-{q:"Completa: 我有___本书 (1)",a:"一"}
-]
-},
-lugares:{
-
-npc1:[
-{q:"¿Cómo se dice escuela?",a:"学校"},
-{q:"¿Cómo se dice hospital?",a:"医院"},
-{q:"¿Cómo se dice tienda?",a:"商店"},
-{q:"¿Cómo se dice casa?",a:"家"},
-{q:"¿Cómo se dice China?",a:"中国"},
-{q:"¿Cómo se dice Estados Unidos?",a:"美国"}
-],
-
-npc2:[
-{q:"¿Qué significa 学校?",a:"escuela"},
-{q:"¿Qué significa 医院?",a:"hospital"},
-{q:"¿Qué significa 商店?",a:"tienda"},
-{q:"¿Qué significa 家?",a:"casa"},
-{q:"¿Qué significa 中国?",a:"china"},
-{q:"¿Qué significa 美国?",a:"estados unidos"}
-],
-
-npc3:[
-{q:"Traduce: 我在学校",a:"estoy en la escuela"},
-{q:"Traduce: 他在医院",a:"el esta en el hospital"},
-{q:"Traduce: 我去商店",a:"voy a la tienda"},
-{q:"Traduce: 我回家",a:"voy a casa"},
-{q:"Traduce: 他在中国",a:"el esta en china"},
-{q:"Traduce: 她在美国",a:"ella esta en estados unidos"}
-],
-
-npc4:[
-{q:"Completa: 我在___ (escuela)",a:"学校"},
-{q:"Completa: 他在___ (hospital)",a:"医院"},
-{q:"Completa: 我去___ (tienda)",a:"商店"},
-{q:"Completa: 我回___ (casa)",a:"家"},
-{q:"Completa: 他在___ (china)",a:"中国"},
-{q:"Completa: 她在___ (usa)",a:"美国"}
-]
 
 }
 
+let xp=0
+let level=1
+
+let currentQuestion={}
+let currentZone=""
+let currentNPC="npc1"
+let questionIndex=0
+
+/* ---------------- BANCO DE PREGUNTAS ---------------- */
+/* SOLO LLENA ESTO */
+
+let hsk1Questions = [
+
+/* SALUDOS */
+
+{zone:"saludos",q:"¿Cómo se dice hola?",a:"你好"},
+{zone:"saludos",q:"¿Cómo se dice gracias?",a:"谢谢"},
+{zone:"saludos",q:"¿Cómo se dice adiós?",a:"再见"},
+{zone:"saludos",q:"¿Cómo se dice por favor?",a:"请"},
+{zone:"saludos",q:"¿Cómo se dice lo siento?",a:"对不起"},
+{zone:"saludos",q:"¿Qué significa 我?",a:"yo"},
+{zone:"saludos",q:"¿Qué significa 你?",a:"tu"},
+{zone:"saludos",q:"¿Qué significa 他?",a:"el"},
+{zone:"saludos",q:"¿Qué significa 她?",a:"ella"},
+{zone:"saludos",q:"¿Qué significa 我们?",a:"nosotros"},
+{zone:"saludos",q:"¿Qué significa 这?",a:"esto"},
+{zone:"saludos",q:"¿Qué significa 那?",a:"eso"},
+
+/* FAMILIA */
+
+{zone:"familia",q:"¿Cómo se dice mamá?",a:"妈妈"},
+{zone:"familia",q:"¿Cómo se dice papá?",a:"爸爸"},
+{zone:"familia",q:"¿Cómo se dice hijo?",a:"儿子"},
+{zone:"familia",q:"¿Cómo se dice hija?",a:"女儿"},
+{zone:"familia",q:"¿Cómo se dice amigo?",a:"朋友"},
+{zone:"familia",q:"¿Cómo se dice profesor?",a:"老师"},
+{zone:"familia",q:"¿Cómo se dice estudiante?",a:"学生"},
+{zone:"familia",q:"¿Cómo se dice médico?",a:"医生"},
+{zone:"familia",q:"¿Cómo se dice señor?",a:"先生"},
+{zone:"familia",q:"¿Cómo se dice señorita?",a:"小姐"},
+{zone:"familia",q:"Traduce: 我爱妈妈",a:"amo a mama"},
+{zone:"familia",q:"Traduce: 我爱爸爸",a:"amo a papa"},
+
+/* NUMEROS */
+
+{zone:"numeros",q:"¿Cómo se dice uno?",a:"一"},
+{zone:"numeros",q:"¿Cómo se dice dos?",a:"二"},
+{zone:"numeros",q:"¿Cómo se dice tres?",a:"三"},
+{zone:"numeros",q:"¿Cómo se dice cuatro?",a:"四"},
+{zone:"numeros",q:"¿Cómo se dice cinco?",a:"五"},
+{zone:"numeros",q:"¿Cómo se dice seis?",a:"六"},
+{zone:"numeros",q:"¿Cómo se dice siete?",a:"七"},
+{zone:"numeros",q:"¿Cómo se dice ocho?",a:"八"},
+{zone:"numeros",q:"¿Cómo se dice nueve?",a:"九"},
+{zone:"numeros",q:"¿Cómo se dice diez?",a:"十"},
+{zone:"numeros",q:"¿Qué significa 几?",a:"cuantos"},
+{zone:"numeros",q:"¿Qué significa 多?",a:"mucho"},
+
+/* LUGARES */
+
+{zone:"lugares",q:"¿Qué significa 中国?",a:"china"},
+{zone:"lugares",q:"¿Qué significa 美国?",a:"estados unidos"},
+{zone:"lugares",q:"¿Qué significa 学校?",a:"escuela"},
+{zone:"lugares",q:"¿Qué significa 医院?",a:"hospital"},
+{zone:"lugares",q:"¿Qué significa 商店?",a:"tienda"},
+{zone:"lugares",q:"¿Qué significa 家?",a:"casa"},
+{zone:"lugares",q:"¿Cómo se dice casa?",a:"家"},
+{zone:"lugares",q:"¿Cómo se dice trabajo?",a:"工作"},
+{zone:"lugares",q:"¿Cómo se dice estudiar?",a:"学习"},
+{zone:"lugares",q:"Ordena: 在 / 我 / 学校",a:"我在学校"},
+{zone:"lugares",q:"Ordena: 去 / 我 / 商店",a:"我去商店"},
+{zone:"lugares",q:"¿Qué significa 哪里?",a:"donde"},
+
+/* BOSS */
+
+{zone:"boss",q:"¿Qué significa 水?",a:"agua"},
+{zone:"boss",q:"¿Qué significa 茶?",a:"te"},
+{zone:"boss",q:"¿Qué significa 米饭?",a:"arroz"},
+{zone:"boss",q:"¿Qué significa 苹果?",a:"manzana"},
+{zone:"boss",q:"¿Qué significa 杯子?",a:"vaso"},
+{zone:"boss",q:"¿Qué significa 猫?",a:"gato"},
+{zone:"boss",q:"¿Qué significa 狗?",a:"perro"},
+{zone:"boss",q:"¿Qué significa 书?",a:"libro"},
+{zone:"boss",q:"¿Qué significa 钱?",a:"dinero"},
+{zone:"boss",q:"¿Qué significa 车?",a:"carro"},
+{zone:"boss",q:"Traduce: 我是学生",a:"soy estudiante"},
+{zone:"boss",q:"Traduce: 他是老师",a:"el es profesor"},
+{zone:"boss",q:"Traduce: 她是医生",a:"ella es doctora"},
+{zone:"boss",q:"Traduce: 我是中国人",a:"soy chino"},
+{zone:"boss",q:"Traduce: 他是美国人",a:"el es americano"},
+{zone:"boss",q:"Traduce: 我爱你",a:"te amo"},
+{zone:"boss",q:"Traduce: 我有朋友",a:"tengo amigos"},
+{zone:"boss",q:"Traduce: 我有书",a:"tengo libros"},
+{zone:"boss",q:"Completa: 我___学生",a:"是"},
+{zone:"boss",q:"Completa: 他___老师",a:"是"},
+{zone:"boss",q:"Completa: 我___中国人",a:"是"},
+{zone:"boss",q:"Completa: 我___一个朋友",a:"有"},
+{zone:"boss",q:"Completa: 我___一个书",a:"有"},
+{zone:"boss",q:"¿Cómo se dice hoy?",a:"今天"},
+{zone:"boss",q:"¿Cómo se dice mañana?",a:"明天"},
+{zone:"boss",q:"¿Cómo se dice ayer?",a:"昨天"},
+{zone:"boss",q:"¿Cómo se dice ahora?",a:"现在"},
+{zone:"boss",q:"¿Cómo se dice tiempo?",a:"时间"},
+{zone:"boss",q:"¿Cómo se dice ver?",a:"看"},
+{zone:"boss",q:"¿Cómo se dice escuchar?",a:"听"},
+{zone:"boss",q:"¿Cómo se dice hablar?",a:"说"},
+{zone:"boss",q:"¿Cómo se dice comer?",a:"吃"},
+{zone:"boss",q:"¿Cómo se dice beber?",a:"喝"},
+{zone:"boss",q:"¿Cómo se dice comprar?",a:"买"},
+{zone:"boss",q:"¿Cómo se dice ir?",a:"去"},
+{zone:"boss",q:"¿Cómo se dice venir?",a:"来"},
+{zone:"boss",q:"¿Cómo se dice vivir?",a:"住"},
+{zone:"boss",q:"¿Cómo se dice llamar?",a:"叫"},
+{zone:"boss",q:"¿Qué significa 大?",a:"grande"},
+{zone:"boss",q:"¿Qué significa 小?",a:"pequeño"},
+{zone:"boss",q:"¿Qué significa 好?",a:"bueno"},
+{zone:"boss",q:"¿Qué significa 少?",a:"poco"},
+{zone:"boss",q:"Traduce: 我喝水",a:"bebo agua"},
+{zone:"boss",q:"Traduce: 我喝茶",a:"bebo te"},
+{zone:"boss",q:"Traduce: 我吃米饭",a:"como arroz"},
+{zone:"boss",q:"Traduce: 我买苹果",a:"compro manzanas"},
+{zone:"boss",q:"Traduce: 我看书",a:"leo libros"}
+
+]
+
+/* ---------------- FILTRAR POR ZONA ---------------- */
+
+function getQuestionsByZone(zone){
+
+return hsk1Questions.filter(q=>q.zone===zone)
 
 }
 
+/* ---------------- PREGUNTAS POR NPC ---------------- */
 
-let boss = [
-{q:"Traduce: 她是我的汉语老师",a:"ella es mi profesora de chino"},
-{q:"Traduce: 我想喝茶",a:"quiero tomar te"},
-{q:"Traduce: 今天几号",a:"que fecha es hoy"}
+function getQuestionsByNPC(zone,npc){
 
+let zoneQuestions=getQuestionsByZone(zone)
 
-]
+let npcNumber=parseInt(npc.replace("npc",""))-1
+
+let start=npcNumber*6
+let end=start+6
+
+return zoneQuestions.slice(start,end)
+
+}
+
+/* ---------------- INICIAR ZONA ---------------- */
 
 function startZone(zone){
 
 if(completedZones[zone]){
-alert("✅ Ya completaste esta zona")
+alert("✅ Zona completada")
 return
 }
 
 document.getElementById("game").style.display="block"
 
-currentZone = zone
-
-currentNPC = "npc1"
-
-questionIndex = 0
-
-document.getElementById("answer").value=""
+currentZone=zone
+currentNPC="npc1"
+questionIndex=0
 
 loadQuestion()
 
 }
 
+/* ---------------- CARGAR PREGUNTA ---------------- */
+
 function loadQuestion(){
 
 if(currentZone=="boss"){
 
-currentQuestion = boss[questionIndex]
+currentQuestion=boss[questionIndex]
 
 }else{
 
-let npcQuestions = zones[currentZone][currentNPC]
+let npcQuestions=getQuestionsByNPC(currentZone,currentNPC)
 
-currentQuestion = npcQuestions[questionIndex]
+currentQuestion=npcQuestions[questionIndex]
 
 }
 
-document.getElementById("question").innerText =
-currentQuestion.q
+document.getElementById("question").innerText=currentQuestion.q
 
-document.getElementById("log").innerText =
+document.getElementById("log").innerText=
 currentZone=="boss"
 ? "👹 Maestro Wang"
-: "👤 Hablando con " + npcNames[currentNPC]
+: "👤 Hablando con "+npcNames[currentNPC]
 
-document.getElementById("answer").value = ""
+document.getElementById("answer").value=""
 document.getElementById("answer").focus()
 
 }
 
+/* ---------------- RESPONDER ---------------- */
+
 function checkAnswer(){
 
-let user =
-document.getElementById("answer").value.trim().toLowerCase()
+let user=document.getElementById("answer").value.trim().toLowerCase()
 
-let correct =
-currentQuestion.a.toLowerCase()
+let correct=currentQuestion.a.toLowerCase()
 
 if(user==correct){
 
@@ -398,8 +354,7 @@ document.getElementById("log").innerText="⚔️ Correcto +20XP"
 
 }else{
 
-document.getElementById("log").innerText=
-"❌ Incorrecto. Respuesta: "+correct
+document.getElementById("log").innerText="❌ "+correct
 
 }
 
@@ -408,21 +363,24 @@ if(xp>=100){
 xp=0
 level++
 
-alert("🎉 SUBISTE A NIVEL "+level)
+alert("🎉 Nivel "+level)
 
 }
 
 document.getElementById("xp").innerText=xp
 document.getElementById("level").innerText=level
 
-document.getElementById("answer").value=""
-
-// avanzar pregunta
 questionIndex++
 
 let npcQuestions
 
-if(questionIndex >= npcQuestions.length){
+if(currentZone=="boss"){
+npcQuestions=boss
+}else{
+npcQuestions=getQuestionsByNPC(currentZone,currentNPC)
+}
+
+if(questionIndex>=npcQuestions.length){
 
 if(currentZone=="boss"){
 
@@ -434,24 +392,23 @@ return
 
 }
 
-questionIndex = 0
+questionIndex=0
 
-if(currentNPC == "npc1") currentNPC = "npc2"
-else if(currentNPC == "npc2") currentNPC = "npc3"
-else if(currentNPC == "npc3") currentNPC = "npc4"
+if(currentNPC=="npc1")currentNPC="npc2"
+else if(currentNPC=="npc2")currentNPC="npc3"
+else if(currentNPC=="npc3")currentNPC="npc4"
 else{
 
-alert("🎉 Zona completada!")
+alert("🎉 Zona completada")
 
-completedZones[currentZone] = true
+completedZones[currentZone]=true
 
 disableZone(currentZone)
-
-currentNPC = "npc1"
 
 document.getElementById("game").style.display="none"
 
 return
+
 }
 
 }
@@ -459,28 +416,37 @@ return
 loadQuestion()
 
 }
+
+/* ---------------- DESHABILITAR ZONA ---------------- */
+
 function disableZone(zone){
 
-let buttons = document.querySelectorAll(".zone")
+let buttons=document.querySelectorAll(".zone")
 
-buttons.forEach(btn =>{
+buttons.forEach(btn=>{
 
 if(btn.getAttribute("onclick").includes(zone)){
 
-btn.style.opacity = "0.4"
-btn.style.pointerEvents = "none"
-btn.innerHTML += " ✔"
+btn.style.opacity="0.4"
+btn.style.pointerEvents="none"
+btn.innerHTML+=" ✔"
 
 }
 
 })
 
 }
+
+/* ---------------- ENTER RESPONDE ---------------- */
+
 document.getElementById("answer").addEventListener("keypress",function(e){
+
 if(e.key==="Enter"){
 checkAnswer()
 }
+
 })
+
 </script>
 
 </body>
