@@ -458,20 +458,17 @@ npcQuestions=getQuestionsByNPC(currentZone,currentNPC)
 }
 
 if(questionIndex>=npcQuestions.length){
-questionIndex=0
-}
 
 questionIndex=0
 
-if(currentNPC=="npc1")currentNPC="npc2"
-else if(currentNPC=="npc2")currentNPC="npc3"
-else if(currentNPC=="npc3")currentNPC="npc4"
+if(currentNPC=="npc1") currentNPC="npc2"
+else if(currentNPC=="npc2") currentNPC="npc3"
+else if(currentNPC=="npc3") currentNPC="npc4"
 else{
 
 alert("🎉 Zona completada")
 
 completedZones[currentZone]=true
-
 disableZone(currentZone)
 
 document.getElementById("game").style.display="none"
@@ -551,6 +548,7 @@ checkAnswer()
 </body>
 
 </html>
+
 
 
 
