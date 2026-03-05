@@ -66,6 +66,7 @@ border-radius:8px;
 margin-top:15px;
 color:#4ade80;
 }
+  
 
 @media (max-width:600px){
 
@@ -118,6 +119,24 @@ button{width:90%}
 <div id="log"></div>
 
 </div>
+<div id="bossBar" style="display:none;margin-top:20px">
+
+<p>👹 Maestro Wang</p>
+
+<div style="background:#374151;border-radius:10px;height:25px;width:100%;max-width:600px;margin:auto">
+
+<div id="bossHPbar"
+style="
+background:#ef4444;
+height:25px;
+width:100%;
+border-radius:10px;
+transition:0.3s;
+"></div>
+
+</div>
+
+</div>
 
 <script>
 
@@ -150,6 +169,8 @@ let currentQuestion={}
 let currentZone=""
 let currentNPC="npc1"
 let questionIndex=0
+let bossHP = 100
+let bossMaxHP = 100
 
 /* ---------------- BANCO DE PREGUNTAS ---------------- */
 /* SOLO LLENA ESTO */
@@ -302,9 +323,25 @@ return
 
 document.getElementById("game").style.display="block"
 
+
 currentZone=zone
 currentNPC="npc1"
 questionIndex=0
+
+if(zone=="boss"){
+
+bossHP=bossMaxHP
+
+document.getElementById("bossBar").style.display="block"
+document.getElementById("bossHPbar").style.background="#ef4444"
+
+updateBossBar()
+
+}else{
+
+document.getElementById("bossBar").style.display="none"
+
+}
 
 loadQuestion()
 
@@ -314,13 +351,17 @@ loadQuestion()
 
 function loadQuestion(){
 
+let npcQuestions
+
 if(currentZone=="boss"){
 
-currentQuestion=boss[questionIndex]
+npcQuestions=getQuestionsByZone("boss")
+
+currentQuestion=npcQuestions[Math.floor(Math.random()*npcQuestions.length)]
 
 }else{
 
-let npcQuestions=getQuestionsByNPC(currentZone,currentNPC)
+npcQuestions=getQuestionsByNPC(currentZone,currentNPC)
 
 currentQuestion=npcQuestions[questionIndex]
 
@@ -350,12 +391,22 @@ if(user==correct){
 
 xp+=20
 
+if(currentZone=="boss"){
+bossHP -= 10
+updateBossBar()
+
+if(bossHP <= 0){
+return
+}
+}
+
+
 document.getElementById("log").innerText="⚔️ Correcto +20XP"
 
 }else{
 
-document.getElementById("log").innerText="❌ "+correct
-
+document.getElementById("log").innerText="❌ Incorrecto. Respuesta: "+correct
+document.getElementById("answer").value=""
 }
 
 if(xp>=100){
@@ -370,27 +421,20 @@ alert("🎉 Nivel "+level)
 document.getElementById("xp").innerText=xp
 document.getElementById("level").innerText=level
 
+if(currentZone!="boss"){
 questionIndex++
+}
 
 let npcQuestions
 
 if(currentZone=="boss"){
-npcQuestions=boss
+npcQuestions=getQuestionsByZone("boss")
 }else{
 npcQuestions=getQuestionsByNPC(currentZone,currentNPC)
 }
 
 if(questionIndex>=npcQuestions.length){
 
-if(currentZone=="boss"){
-
-alert("🏆 DERROTASTE AL MAESTRO WANG")
-
-document.getElementById("game").style.display="none"
-
-return
-
-}
 
 questionIndex=0
 
@@ -436,6 +480,34 @@ btn.innerHTML+=" ✔"
 })
 
 }
+function updateBossBar(){
+
+let percent = (bossHP / bossMaxHP) * 100
+
+document.getElementById("bossHPbar").style.width = percent + "%"
+  
+if(percent < 50){
+document.getElementById("bossHPbar").style.background="#f97316"
+}
+
+if(percent < 25){
+document.getElementById("bossHPbar").style.background="#dc2626"
+}
+  
+if(bossHP <= 0){
+
+alert("🏆 DERROTASTE AL MAESTRO WANG")
+
+document.getElementById("game").style.display="none"
+document.getElementById("bossBar").style.display="none"
+
+bossHP = bossMaxHP
+
+return
+
+}
+
+}
 
 /* ---------------- ENTER RESPONDE ---------------- */
 
@@ -452,4 +524,5 @@ checkAnswer()
 </body>
 
 </html>
+
 
