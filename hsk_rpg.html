@@ -53,6 +53,9 @@ padding:12px;
 font-size:16px;
 width:80%;
 max-width:300px;
+border-radius:6px;
+border:none;
+outline:none;
 }
 
 button{
@@ -360,6 +363,11 @@ if(currentZone=="boss"){
 
 npcQuestions=getQuestionsByZone("boss")
 
+if(npcQuestions.length===0){
+alert("No hay preguntas para el boss")
+return
+}
+
 currentQuestion=npcQuestions[Math.floor(Math.random()*npcQuestions.length)]
 
 }else{
@@ -396,7 +404,8 @@ document.getElementById("answer").focus()
 
 function checkAnswer(){
 
-let user=document.getElementById("answer").value.trim().toLowerCase()
+let user=document.getElementById("answer").value.trim()
+let correct=currentQuestion.a.trim()
   
 if(!currentQuestion) return
 let correct=currentQuestion.a.toLowerCase()
@@ -548,6 +557,7 @@ checkAnswer()
 </body>
 
 </html>
+
 
 
 
