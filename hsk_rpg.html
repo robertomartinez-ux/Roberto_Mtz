@@ -63,6 +63,14 @@ padding:12px 20px;
 margin-top:12px;
 font-size:18px;
 border-radius:8px;
+border:none;
+background:#22c55e;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#16a34a;
 }
 
 #log{
@@ -404,12 +412,10 @@ document.getElementById("answer").focus()
 
 function checkAnswer(){
 
-let user=document.getElementById("answer").value.trim()
-let correct=currentQuestion.a.trim()
-  
 if(!currentQuestion) return
-let correct=currentQuestion.a.toLowerCase()
-  
+
+let user=document.getElementById("answer").value.trim().toLowerCase()
+let correct=currentQuestion.a.trim().toLowerCase()
 
 if(user==correct){
 
@@ -557,6 +563,7 @@ checkAnswer()
 </body>
 
 </html>
+
 
 
 
